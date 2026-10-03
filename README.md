@@ -7,16 +7,24 @@ The system consists of:
 - **Frontend:** React with Vite (dashboard + charts)
 - **Database:** MySQL
 
+There are **two ways to run this project**:
+
+- **[Option A — Docker](#option-a--run-with-docker-recommended)** Recommended. One command, nothing to install except Docker Desktop.
+- **[Option B — Manual installation](#option-b--manual-installation)** For users who prefer native installs (PHP, MySQL, Node on the host).
+
 ---
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Project Structure](#project-structure)
-3. [Prerequisites](#prerequisites)
-4. [Installation](#installation)
-5. [Running the Application](#running-the-application)
-6. [Troubleshooting](#troubleshooting)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Option A — Run with Docker (recommended)](#option-a--run-with-docker-recommended)
+- [Option B — Manual installation](#option-b--manual-installation)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+- [Troubleshooting](#troubleshooting)
+- [Testing the API Manually](#testing-the-api-manually)
 
 ---
 
@@ -60,6 +68,8 @@ Tracker/
 │   ├── routes/
 │   │   └── api.php
 │   ├── .env.example
+│   ├── Dockerfile
+│   ├── .dockerignore
 │   └── composer.json
 │
 ├── frontend/                   React application
@@ -78,19 +88,63 @@ Tracker/
 │   │       └── constants.js
 │   ├── index.html
 │   ├── package.json
-│   └── vite.config.js
+│   ├── vite.config.js
+│   ├── Dockerfile
+│   └── .dockerignore
 │
+├── docker-compose.yml
+├── .dockerignore
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Prerequisites
+## Option A — Run with Docker (recommended)
+
+**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) only.
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+The first run takes 2–5 minutes (builds images + installs dependencies). Subsequent runs are fast.
+
+Once you see:
+
+```
+tracker_backend  | INFO  Server running on [http://0.0.0.0:8000].
+tracker_frontend | VITE v5.x.x  ready in ...
+```
+
+Open http://localhost:5173 — the app is running.
+
+**Common commands:**
+
+```bash
+docker compose up -d                              # run in background
+docker compose logs -f                            # follow logs
+docker compose down                               # stop containers
+docker compose down -v                            # stop AND wipe the database
+docker compose exec backend php artisan migrate   # run migrations manually
+docker compose exec backend bash                  # shell into backend
+```
+
+**Port conflicts:** if `8000`, `5173`, or `3307` are already taken, edit the left side of the `ports:` mapping in `docker-compose.yml`.
+
+---
+
+## Option B — Manual installation
+
+Use this option if you prefer running PHP, MySQL, and Node directly on your machine instead of inside Docker.
+
+### Prerequisites
 
 Before running this project, install the following tools on your machine. Follow the installation instructions for your operating system.
 
-### 1. PHP (version 8.2 or higher)
+#### 1. PHP (version 8.2 or higher)
 
 **Windows:**
 1. Download PHP from https://windows.php.net/download/
@@ -110,7 +164,7 @@ sudo apt update
 sudo apt install php php-cli php-mbstring php-xml php-mysql php-curl php-zip php-bcmath
 ```
 
-### 2. Composer (PHP dependency manager)
+#### 2. Composer (PHP dependency manager)
 
 Download and install from https://getcomposer.org/download/
 
@@ -119,7 +173,7 @@ Download and install from https://getcomposer.org/download/
 composer -V
 ```
 
-### 3. MySQL (version 8.0 or higher)
+#### 3. MySQL (version 8.0 or higher)
 
 **Windows:**
 Download MySQL Installer from https://dev.mysql.com/downloads/installer/
@@ -143,7 +197,7 @@ sudo service mysql start
 mysql --version
 ```
 
-### 4. Node.js (version 18 or higher) and npm
+#### 4. Node.js (version 18 or higher) and npm
 
 Download from https://nodejs.org/ and install the LTS version.
 
@@ -153,7 +207,7 @@ node -v
 npm -v
 ```
 
-### 5. Git
+#### 5. Git
 
 Download from https://git-scm.com/downloads
 
@@ -162,11 +216,9 @@ Download from https://git-scm.com/downloads
 git --version
 ```
 
----
+### Installation
 
-## Installation
-
-### Step 1: Clone the Repository
+#### Step 1: Clone the Repository
 
 Open a terminal (Command Prompt, PowerShell, Terminal, or Git Bash) and run:
 
@@ -177,7 +229,7 @@ cd Tracker
 
 Replace `YOUR_USERNAME` with the actual GitHub username where the repository is hosted.
 
-### Step 2: Set Up the Database
+#### Step 2: Set Up the Database
 
 Open MySQL using one of these methods:
 
@@ -199,7 +251,7 @@ EXIT;
 4. Choose `utf8mb4_general_ci` as collation
 5. Click "Create"
 
-### Step 3: Set Up the Backend
+#### Step 3: Set Up the Backend
 
 Navigate to the backend folder:
 
@@ -250,7 +302,7 @@ Run the database migrations to create all tables:
 php artisan migrate
 ```
 
-### Step 4: Set Up the Frontend
+#### Step 4: Set Up the Frontend
 
 Open a **new terminal window** (keep the first one available). Navigate to the frontend folder from the project root:
 
@@ -282,13 +334,11 @@ const api = axios.create({
 
 If your backend runs on a different host or port, update `baseURL` accordingly.
 
----
-
-## Running the Application
+### Running the Application
 
 The application requires **two servers running simultaneously** — one for the backend and one for the frontend.
 
-### Terminal 1: Start the Laravel Backend
+#### Terminal 1: Start the Laravel Backend
 
 ```bash
 cd Tracker/backend
@@ -303,7 +353,7 @@ INFO  Server running on [http://127.0.0.1:8000].
 
 The API is now accessible at http://localhost:8000/api
 
-### Terminal 2: Start the React Frontend
+#### Terminal 2: Start the React Frontend
 
 Open a new terminal window:
 
@@ -319,7 +369,7 @@ VITE v5.x.x  ready in 400 ms
 ➜  Local:   http://localhost:5173/
 ```
 
-### Access the Application
+#### Access the Application
 
 Open your web browser and navigate to:
 
@@ -400,6 +450,9 @@ If you change the port, also update `frontend/src/api.js` to match.
 **Frontend:**
 Vite automatically picks the next available port (5174, 5175, etc.). Check the terminal output for the actual URL.
 
+**Docker:**
+Edit the left side of the `ports:` mapping in `docker-compose.yml` (e.g. change `"8000:8000"` to `"8001:8000"`).
+
 ### Charts Do Not Render
 
 If the dashboard loads but the charts are blank:
@@ -440,11 +493,33 @@ sudo chown -R $USER:$USER Tracker
 
 The database has not been created yet. Return to Step 2 in the Installation section and create the `project_tracker` database.
 
+### Docker: Container Keeps Restarting
+
+Check the logs:
+
+```bash
+docker compose logs backend
+```
+
+Common causes:
+- MySQL wasn't ready in time (rare — the healthcheck should handle it).
+- A migration failed. Fix the migration file and restart with `docker compose up`.
+- Port conflict on `8000`, `5173`, or `3307`.
+
+### Docker: Full Reset
+
+To stop everything and wipe the database:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
 ---
 
 ## Testing the API Manually
 
-With the backend running, use `curl` to verify endpoints:
+With the backend running (either method), use `curl` to verify endpoints:
 
 **List all projects:**
 ```bash

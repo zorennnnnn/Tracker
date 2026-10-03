@@ -40,6 +40,10 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
   --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* fluid padding helpers */
+  --page-pad-x: clamp(16px, 4vw, 48px);
+  --page-pad-y: clamp(24px, 4vw, 48px);
 }
 
 /* ============================================================
@@ -48,13 +52,18 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { min-height: 100%; }
 
+/* fluid type on the root — scales the whole UI proportionally */
+html {
+  font-size: clamp(14px, 0.9vw + 10px, 16px);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--black);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 
-  /* colored ambient background */
   background:
     radial-gradient(1100px 550px at 0% 0%,   rgba(0, 140, 173, 0.12), transparent 60%),
     radial-gradient(900px 500px at 100% 0%,  rgba(230, 171, 38, 0.14), transparent 55%),
@@ -76,6 +85,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
 }
 button:hover { opacity: 0.92; }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -98,28 +108,31 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ============================================================
-   APP SHELL — no nav, no topbar
+   APP SHELL
    ============================================================ */
-.app-shell {
-  min-height: 100vh;
-}
+.app-shell { min-height: 100vh; }
 
 .main-area {
-  padding: 48px 48px 72px;
+  padding: var(--page-pad-y) var(--page-pad-x) calc(var(--page-pad-y) + 24px);
   max-width: 1500px;
   width: 100%;
   margin: 0 auto;
 }
 
+/* on ultra-wide screens give the content a bit more air */
+@media (min-width: 1700px) {
+  .main-area { max-width: 1700px; }
+}
+
 /* ============================================================
-   PAGE HEADER (logo + title + action)
+   PAGE HEADER
    ============================================================ */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  gap: 24px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
@@ -128,6 +141,7 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   gap: 20px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .header-logo {
@@ -154,6 +168,7 @@ input:focus, select:focus, textarea:focus {
   height: 10px;
   background: var(--gold);
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .page-subtitle {
@@ -167,7 +182,7 @@ input:focus, select:focus, textarea:focus {
    ============================================================ */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -257,16 +272,13 @@ input:focus, select:focus, textarea:focus {
    ============================================================ */
 .charts-grid {
   display: grid;
-  grid-template-columns: 1.15fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
 }
-
-@media (max-width: 1100px) {
-  .charts-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 720px) {
-  .charts-grid { grid-template-columns: 1fr; }
+/* lock a 3-column layout on wider screens */
+@media (min-width: 1100px) {
+  .charts-grid { grid-template-columns: 1.15fr 1fr 1fr; }
 }
 
 .chart-card {
@@ -277,6 +289,7 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
+  min-width: 0; /* allows recharts to shrink */
 }
 
 .chart-header {
@@ -284,6 +297,8 @@ input:focus, select:focus, textarea:focus {
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .chart-title {
@@ -297,9 +312,12 @@ input:focus, select:focus, textarea:focus {
   color: var(--gray-500);
 }
 
-.chart-body { flex: 1; min-height: 220px; }
+.chart-body {
+  flex: 1;
+  min-height: 220px;
+  min-width: 0; /* critical for recharts responsiveness */
+}
 
-/* chart legend adjustments */
 .recharts-default-tooltip {
   border-radius: 10px !important;
   border: 1px solid var(--gray-200) !important;
@@ -320,10 +338,11 @@ input:focus, select:focus, textarea:focus {
 }
 
 .search-wrapper {
-  flex: 1 1 260px;
+  flex: 1 1 240px;
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .search-wrapper input {
@@ -391,7 +410,7 @@ input:focus, select:focus, textarea:focus {
   font-weight: 500;
   color: var(--gray-700);
   width: auto;
-  min-width: 130px;
+  min-width: 120px;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236C757D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -413,11 +432,11 @@ input:focus, select:focus, textarea:focus {
   height: 44px;
   box-shadow: var(--shadow-xs);
 }
-.sort-wrapper select { min-width: 180px; }
+.sort-wrapper select { min-width: 170px; }
 .sort-wrapper .sort-icon { color: var(--gold); width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ============================================================
-   TABLE
+   TABLE — desktop
    ============================================================ */
 .table-container {
   background: var(--white);
@@ -455,6 +474,9 @@ input:focus, select:focus, textarea:focus {
 .project-table tr:last-child td { border-bottom: none; }
 .project-table tbody tr { transition: background 0.1s; }
 .project-table tbody tr:hover td { background: var(--gray-50); }
+
+/* hide the "field label" cell that we add for mobile cards */
+.project-table td[data-label]::before { content: none; }
 
 /* ============================================================
    BADGES
@@ -630,24 +652,255 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE — TABLET (≤ 900px)
    ============================================================ */
-@media (max-width: 900px) {
-  .main-area { padding: 28px 20px 56px; }
+@media (min-width: 641px) and (max-width: 900px) {
+  .page-header h1 { font-size: 26px; }
+  .header-logo { height: 54px; }
+  .filter-badge select { min-width: 110px; }
+  .sort-wrapper select { min-width: 150px; }
 }
 
+/* ============================================================
+   RESPONSIVE — PHONE (≤ 640px)
+   Table turns into cards
+   ============================================================ */
 @media (max-width: 640px) {
-  .header-logo { height: 48px; }
-  .page-header h1 { font-size: 22px; }
+  .main-area {
+    padding: 20px 16px 40px;
+  }
+
+  /* ---------- HEADER: stack logo above title ---------- */
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .page-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .header-logo {
+    height: 44px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    gap: 8px;
+  }
+  .page-header h1 .accent-dot {
+    width: 8px;
+    height: 8px;
+  }
+  .page-subtitle {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  /* make the "New Project" button full-width and prominent */
+  .page-header > .btn-primary {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: 15px;
+  }
+
+  /* ---------- TOOLBAR: search on top, filter stack below ---------- */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .search-wrapper {
+    flex: 1 1 100%;
+  }
+
+  .filter-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  /* each filter becomes a mini stack: label on top, pill below */
+  .filter-badge {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    gap: 6px;
+  }
+  .filter-badge:focus-within { box-shadow: none; }
+
+  .filter-badge .filter-label {
+    display: block; /* ← bring it back */
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    margin: 0 0 0 4px;
+  }
+
+  .filter-badge select {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-pill);
+    height: 42px;
+    padding: 0 32px 0 14px;
+    font-size: 14px;
+    box-shadow: var(--shadow-xs);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236C757D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* sort spans both columns, same stack treatment */
+  .sort-wrapper {
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    gap: 6px;
+  }
+  .sort-wrapper .sort-icon { display: none; }
+  .sort-wrapper::before {
+    content: 'Sort by';
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    margin-left: 4px;
+  }
+  .sort-wrapper select {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-pill);
+    height: 42px;
+    padding: 0 32px 0 14px;
+    font-size: 14px;
+    box-shadow: var(--shadow-xs);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236C757D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ---------- STAT CARDS: 2-up ---------- */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-card { padding: 14px; border-radius: 12px; }
+  .stat-value { font-size: 22px; }
+  .stat-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-hint { display: none; }
+
+  /* ---------- CHARTS: stack ---------- */
+  .charts-grid { gap: 12px; margin-bottom: 24px; }
+  .chart-card { padding: 16px 12px 8px; }
+  .chart-body { min-height: 200px; }
+  .recharts-legend-wrapper { font-size: 11px !important; }
+
+  /* ---------- TABLE → CARDS ---------- */
+  .table-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .project-table,
+  .project-table thead,
+  .project-table tbody,
+  .project-table tr,
+  .project-table th,
+  .project-table td {
+    display: block;
+    width: 100%;
+  }
+  .project-table thead { display: none; }
+
+  .project-table tbody tr {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-xs);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 12px;
+    row-gap: 12px;
+  }
+  .project-table tbody tr:hover td { background: transparent; }
+
+  .project-table tbody td {
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    word-break: break-word;
+  }
+  .project-table tbody td[data-label]::before {
+    content: attr(data-label);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+  }
+
+  .project-table tbody td[data-label="Client"],
+  .project-table tbody td[data-label="Project"] {
+    grid-column: 1 / -1;
+  }
+  .project-table tbody td[data-label="Actions"] {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 4px;
+  }
+  .project-table tbody td[data-label="Actions"]::before { content: none; }
+  .action-btn { padding: 8px 12px; }
+
+  /* ---------- MODAL ---------- */
+  .modal-content { padding: 24px 20px; }
+  .modal-content h2 { font-size: 20px; margin-bottom: 18px; }
+  .form-grid { grid-template-columns: 1fr; gap: 14px; }
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions button { width: 100%; }
 }
 
-@media (max-width: 700px) {
-  .main-area { padding: 24px 16px 48px; }
-  .project-table th, .project-table td { padding: 12px; }
-  .project-table th:nth-child(5),
-  .project-table td:nth-child(5),
-  .project-table th:nth-child(6),
-  .project-table td:nth-child(6) { display: none; }
-  .form-grid { grid-template-columns: 1fr; }
-  .stat-value { font-size: 24px; }
+/* ============================================================
+   RESPONSIVE — SMALL PHONE (≤ 400px)
+   ============================================================ */
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-hint { display: block; font-size: 11px; }
+
+  .filter-group { grid-template-columns: 1fr; }
+  .sort-wrapper { grid-column: 1; }
+
+  .project-table tbody tr { grid-template-columns: 1fr; }
+  .project-table tbody td[data-label] { grid-column: 1; }
+
+  .page-header h1 { font-size: 20px; }
+  .header-logo { height: 38px; }
 }

@@ -1,33 +1,22 @@
 import { STATUS_COLORS, PRIORITY_COLORS } from '../utils/constants';
 
 export function StatusBadge({ status }) {
-  const c = STATUS_COLORS[status] || { bg: '#e5e7eb', text: '#374151' };
-  return (
-    <span style={{
-      background: c.bg,
-      color: c.text,
-      padding: '2px 10px',
-      borderRadius: '999px',
-      fontSize: '12px',
-      fontWeight: 600,
-    }}>
-      {status}
-    </span>
-  );
+  const cls = {
+    'Planning': 'badge-status-planning',
+    'In Progress': 'badge-status-in-progress',
+    'On Hold': 'badge-status-on-hold',
+    'Completed': 'badge-status-completed',
+  }[status] || 'badge-status-planning';
+
+  return <span className={`badge ${cls}`}>{status}</span>;
 }
 
 export function PriorityBadge({ priority }) {
-  const c = PRIORITY_COLORS[priority] || { bg: '#e5e7eb', text: '#374151' };
-  return (
-    <span style={{
-      background: c.bg,
-      color: c.text,
-      padding: '2px 10px',
-      borderRadius: '999px',
-      fontSize: '12px',
-      fontWeight: 600,
-    }}>
-      {priority}
-    </span>
-  );
+  const cls = {
+    'Low': 'badge-priority-low',
+    'Medium': 'badge-priority-medium',
+    'High': 'badge-priority-high',
+  }[priority] || 'badge-priority-low';
+
+  return <span className={`badge ${cls}`}>{priority}</span>;
 }

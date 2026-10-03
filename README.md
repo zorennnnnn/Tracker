@@ -4,7 +4,7 @@ A full-stack web application for digital agencies to manage client projects, tra
 
 The system consists of:
 - **Backend:** Laravel 11 REST API
-- **Frontend:** React with Vite
+- **Frontend:** React with Vite (dashboard + charts)
 - **Database:** MySQL
 
 ---
@@ -26,8 +26,16 @@ The system consists of:
 - Track project status: Planning, In Progress, On Hold, Completed
 - Assign priority levels: Low, Medium, High
 - Set start and due dates with validation
+- **Dashboard overview** with live stat cards (Total, In Progress, Completed, Overdue)
+- **Charts** powered by Recharts:
+  - Donut chart: projects by status
+  - Bar chart: priority distribution
+  - Area chart: upcoming deadlines for the next 6 months
+- **Search** projects by client or project name
+- **Filter** by status and priority
+- **Sort** by due date, priority, or project name
 - Form validation on both frontend and backend
-- Clean and responsive user interface
+- Clean, modern, responsive UI using a teal/gold palette
 - RESTful API architecture
 
 ---
@@ -59,6 +67,7 @@ Tracker/
 │   │   ├── api.js
 │   │   ├── App.jsx
 │   │   ├── main.jsx
+│   │   ├── index.css           Global styles + design tokens
 │   │   ├── components/
 │   │   │   ├── ProjectForm.jsx
 │   │   │   ├── ConfirmDialog.jsx
@@ -255,6 +264,11 @@ Install JavaScript dependencies:
 npm install
 ```
 
+> **Note:** The frontend uses **Recharts** for the dashboard charts. It will be installed automatically by `npm install` because it is listed in `package.json`. If for any reason it is missing, install it manually with:
+> ```bash
+> npm install recharts
+> ```
+
 Open `src/api.js` and confirm the API base URL matches your backend:
 
 ```javascript
@@ -313,15 +327,18 @@ Open your web browser and navigate to:
 http://localhost:5173
 ```
 
-You will see the Client Projects page where you can:
+You will see the **Projects Dashboard** where you can:
 
-- View all projects in a table
-- Click "+ New Project" to create a project
-- Click "Edit" on any row to modify a project
-- Click "Delete" to remove a project with confirmation
+- View stat cards (Total, In Progress, Completed, Overdue)
+- View the three charts (status donut, priority bar, upcoming deadlines)
+- Search by client or project name
+- Filter by status and priority
+- Sort by due date, priority, or project name
+- Click **"+ New Project"** to create a project
+- Click **Edit** on any row to modify a project
+- Click **Delete** to remove a project with confirmation
 
 ---
-
 
 ## Troubleshooting
 
@@ -382,6 +399,21 @@ If you change the port, also update `frontend/src/api.js` to match.
 
 **Frontend:**
 Vite automatically picks the next available port (5174, 5175, etc.). Check the terminal output for the actual URL.
+
+### Charts Do Not Render
+
+If the dashboard loads but the charts are blank:
+
+1. Verify `recharts` is installed:
+   ```bash
+   cd frontend
+   npm ls recharts
+   ```
+   If missing, run:
+   ```bash
+   npm install recharts
+   ```
+2. Open the browser DevTools console. If you see errors like `Cannot find module 'recharts'`, the install did not complete — rerun it.
 
 ### "php" or "composer" Command Not Recognized
 

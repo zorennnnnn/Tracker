@@ -30,7 +30,6 @@ export default function ProjectForm({ open, initial, onSubmit, onCancel, submitt
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Client-side validation matching backend rules
   const validate = () => {
     const errs = {};
     if (!form.client_name.trim()) errs.client_name = 'Client name is required';
@@ -59,19 +58,19 @@ export default function ProjectForm({ open, initial, onSubmit, onCancel, submitt
   };
 
   return (
-    <div style={styles.backdrop}>
-      <form onSubmit={handleSubmit} style={styles.modal}>
-        <h2 style={{ marginBottom: 20 }}>
-          {initial ? 'Edit Project' : 'New Project'}
-        </h2>
+    <div className="modal-backdrop" onClick={(e) => {
+      if (e.target === e.currentTarget && !submitting) onCancel();
+    }}>
+      <form onSubmit={handleSubmit} className="modal-content">
+        <h2>{initial ? 'Edit Project' : 'New Project'}</h2>
 
         {errors.length > 0 && (
-          <div style={styles.errorBox}>
+          <div className="error-box">
             {errors.map((msg, i) => <div key={i}>• {msg}</div>)}
           </div>
         )}
 
-        <div style={styles.grid}>
+        <div className="form-grid">
           <Field label="Client Name" error={clientErrors.client_name}>
             <input
               name="client_name"
@@ -111,7 +110,7 @@ export default function ProjectForm({ open, initial, onSubmit, onCancel, submitt
           </Field>
         </div>
 
-        <div style={styles.actions}>
+        <div className="modal-actions">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={submitting}>
             Cancel
           </button>
@@ -126,34 +125,10 @@ export default function ProjectForm({ open, initial, onSubmit, onCancel, submitt
 
 function Field({ label, error, full, children }) {
   return (
-    <div style={{ gridColumn: full ? '1 / -1' : 'auto' }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-        {label}
-      </label>
+    <div className={`field ${full ? 'full' : ''}`}>
+      <label>{label}</label>
       {children}
       {error && <div className="error-text">{error}</div>}
     </div>
   );
 }
-
-const styles = {
-  backdrop: {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 100, padding: 16, overflowY: 'auto',
-  },
-  modal: {
-    background: 'white', padding: 24, borderRadius: 10,
-    width: 600, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto',
-  },
-  grid: {
-    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20,
-  },
-  actions: {
-    display: 'flex', justifyContent: 'flex-end', gap: 8,
-  },
-  errorBox: {
-    background: '#fee2e2', color: '#991b1b', padding: 12,
-    borderRadius: 6, marginBottom: 16, fontSize: 13,
-  },
-};
